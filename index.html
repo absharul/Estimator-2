@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scrap Auction Profit & GST Calculator</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 15px;
+        min-height: 100vh;
+    }
+    
+    .container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+    
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 24px 20px;
+        text-align: center;
+    }
+    
+    .header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+    
+    .header p {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+    
+    .form-section {
+        padding: 24px 20px;
+    }
+    
+    .input-group {
+        margin-bottom: 20px;
+    }
+    
+    .input-group label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+    
+    .input-wrapper {
+        position: relative;
+    }
+    
+    .input-wrapper::before {
+        content: '₹';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    
+    input {
+        width: 100%;
+        padding: 12px 12px 12px 28px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s;
+        background: #f9f9f9;
+    }
+    
+    input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    input::placeholder {
+        color: #999;
+        font-size: 13px;
+    }
+    
+    .calc-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 10px;
+    }
+    
+    .calc-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .calc-btn:active {
+        transform: translateY(0);
+    }
+    
+    .result {
+        display: none;
+        padding: 24px 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-top: 3px solid #667eea;
+    }
+    
+    .result h3 {
+        color: #333;
+        margin-bottom: 16px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        font-size: 14px;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-row label {
+        color: #555;
+        font-weight: 500;
+    }
+    
+    .detail-row span {
+        color: #333;
+        font-weight: 600;
+    }
+    
+    .section-divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #667eea, transparent);
+        margin: 16px 0;
+    }
+    
+    .total-section {
+        background: white;
+        padding: 16px;
+        border-radius: 10px;
+        margin: 16px 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    .profit-highlight {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin-top: 16px;
+    }
+    
+    .profit-highlight h2 {
+        font-size: 32px;
+        margin-bottom: 8px;
+    }
+    
+    .profit-highlight .subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+    
+    .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+    }
+    
+    .metric-card {
+        background: white;
+        padding: 12px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    .metric-card .value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #667eea;
+        display: block;
+        margin-bottom: 4px;
+    }
+    
+    .metric-card .label {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .profit-positive {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .profit-negative {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    }
+    
+    @media (max-width: 480px) {
+        .header h1 { font-size: 20px; }
+        .profit-highlight h2 { font-size: 28px; }
+        .form-section { padding: 20px 16px; }
+        .result { padding: 20px 16px; }
+    }
+</style>
+</head>
+
+<body>
+<div class="container">
+    <div class="header">
+        <h1>💼 Scrap Auction Calculator</h1>
+        <p>Calculate your profit with GST & expenses</p>
+    </div>
+
+    <div class="form-section">
+        <div class="input-group">
+            <label>Bid Rate per KG</label>
+            <div class="input-wrapper">
+                <input type="number" id="bidRate" step="0.01" placeholder="Enter bid rate">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Quantity (KG)</label>
+            <div class="input-wrapper">
+                <input type="number" id="qty" step="0.01" placeholder="Enter quantity">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Average Selling Price per KG</label>
+            <div class="input-wrapper">
+                <input type="number" id="sellRate" step="0.01" placeholder="Enter selling price">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Transportation Cost per KG</label>
+            <div class="input-wrapper">
+                <input type="number" id="transportRate" step="0.01" placeholder="1 to 2">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Labour Cost per KG</label>
+            <div class="input-wrapper">
+                <input type="number" id="labourRate" step="0.01" placeholder="1 to 2">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Miscellaneous Cost per KG</label>
+            <div class="input-wrapper">
+                <input type="number" id="miscRate" step="0.01" placeholder="0.50 - 2">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Self Expense (Fixed Amount)</label>
+            <div class="input-wrapper">
+                <input type="number" id="selfExpense" step="0.01" placeholder="Example: 2000 or 5000">
+            </div>
+        </div>
+
+        <button class="calc-btn" onclick="calc()">📊 Calculate Profit / Loss</button>
+    </div>
+
+    <div id="output" class="result"></div>
+</div>
+
+<script>
+function calc() {
+    const bidRate = parseFloat(document.getElementById('bidRate').value) || 0;
+    const qty = parseFloat(document.getElementById('qty').value) || 0;
+    const sellRate = parseFloat(document.getElementById('sellRate').value) || 0;
+    const transportRate = parseFloat(document.getElementById('transportRate').value) || 0;
+    const labourRate = parseFloat(document.getElementById('labourRate').value) || 0;
+    const miscRate = parseFloat(document.getElementById('miscRate').value) || 0;
+    const selfExpense = parseFloat(document.getElementById('selfExpense').value) || 0;
+
+    const totalBid = bidRate * qty;
+    const gst = totalBid * 0.18;
+    const costAfterGst = totalBid + gst;
+    const transportCost = transportRate * qty;
+    const labourCost = labourRate * qty;
+    const miscCost = miscRate * qty;
+    const totalExpense = costAfterGst + transportCost + labourCost + miscCost + selfExpense;
+    const revenue = sellRate * qty;
+    const profit = revenue - totalExpense;
+    const profitPerKg = profit / qty;
+    const margin = (profit / totalExpense) * 100;
+
+    const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
+    const profitIcon = profit >= 0 ? '📈' : '📉';
+    const profitText = profit >= 0 ? 'Profit' : 'Loss';
+
+    document.getElementById('output').style.display = "block";
+    document.getElementById('output').innerHTML = `
+        <h3>📋 Cost Breakdown</h3>
+        
+        <div class="detail-row">
+            <label>Total Bid Amount</label>
+            <span>₹${totalBid.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+        </div>
+        <div class="detail-row">
+            <label>GST (18%)</label>
+            <span>₹${gst.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+        </div>
+        <div class="detail-row">
+            <label>Cost After GST</label>
+            <span>₹${costAfterGst.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="detail-row">
+            <label>Transportation Cost</label>
+            <span>₹${transportCost.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+        </div>
+        <div class="detail-row">
+            <label>Labour Cost</label>
+            <span>₹${labourCost.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+        </div>
+        <div class="detail-row">
+            <label>Miscellaneous Cost</label>
+            <span>₹${miscCost.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+        </div>
+        <div class="detail-row">
+            <label>Self Expense (Fixed)</label>
+            <span>₹${selfExpense.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+        </div>
+        
+        <div class="total-section">
+            <div class="total-row">
+                <label>Total Expense</label>
+                <span>₹${totalExpense.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+            </div>
+            <div class="total-row" style="color: #11998e;">
+                <label>Total Revenue</label>
+                <span>₹${revenue.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>
+            </div>
+        </div>
+        
+        <div class="profit-highlight ${profitClass}">
+            <div class="subtitle">${profitText}</div>
+            <h2>${profitIcon} ₹${Math.abs(profit).toLocaleString('en-IN', {maximumFractionDigits: 2})}</h2>
+        </div>
+        
+        <div class="metrics">
+            <div class="metric-card">
+                <span class="value">₹${profitPerKg.toFixed(2)}</span>
+                <span class="label">Profit per KG</span>
+            </div>
+            <div class="metric-card">
+                <span class="value">${margin.toFixed(2)}%</span>
+                <span class="label">Profit Margin</span>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+
+</body>
+</html>
